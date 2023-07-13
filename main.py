@@ -131,7 +131,16 @@ async def create_item(item_id: int, item: Item, q: str | None = None):
 
 
 @app.get("/items/")
-async def read_items(q: Annotated[str | None, Query(max_length=50)] = None):
+async def read_items(
+        q: Annotated[
+            str | None,
+            Query(
+                title="Query string",
+                description="Query string for the items to search in the database that have a good match",
+                min_length=3,
+            ),
+        ] = None
+):
     results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
     if q:
         results.update({"q": q})
