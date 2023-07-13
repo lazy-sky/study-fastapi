@@ -151,8 +151,10 @@ async def create_item(item_id: int, item: Item, q: str | None = None):
 # Path를 사용하여 경로 매개변수에 검증과 메타데이터를 같은 타입으로 선언할 수 있다.
 @app.get("/items/{item_id}")
 async def read_items(
-    item_id: Annotated[int, Path(title="The ID of the item to get")],
-    q: Annotated[str | None, Query(alias="item-query")] = None,
+    # gt(greater than), ge, lt, le(less than or equal)
+    item_id: Annotated[int, Path(title="The ID of the item to get",  ge=0, le=1000)],
+    q: str,
+    size: Annotated[float, Query(gt=0, lt=10.5)],
 ):
     results = {"item_id": item_id}
     if q:
