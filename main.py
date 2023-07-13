@@ -1,12 +1,25 @@
-from typing import Annotated
-
-from fastapi import FastAPI, Header
+from fastapi import FastAPI
+from pydantic import BaseModel
 
 app = FastAPI()
 
-# Query, Path 파라미터와 같은 방식으로 헤더 파라미터 정의 가능
+
+class Item(BaseModel):
+    name: str
+    description: str | None = None
+    price: float
+    tax: float | None = None
+    tags: list[str] = []
+
+
+@app.post("/items/")
+async def create_item(item: Item) -> Item:
+    return item
 
 
 @app.get("/items/")
-async def read_items(user_agent: Annotated[str | None, Header()] = None):
-    return {"User-Agent": user_agent}
+async def read_items() -> list[Item]:
+    return [
+        Item(name="Portal Gun", price=42.0),
+        Item(name="Plumbus", price=32.0),
+    ]
