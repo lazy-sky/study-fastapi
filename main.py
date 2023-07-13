@@ -1,5 +1,5 @@
 from enum import Enum
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Path, Query
 from pydantic import BaseModel
 from typing import Annotated
 
@@ -130,18 +130,31 @@ async def create_item(item_id: int, item: Item, q: str | None = None):
 # - docs에도 잘 표시됨
 
 
-@app.get("/items/")
+# @app.get("/items/")
+# async def read_items(
+#         q: Annotated[
+#             str | None,
+#             Query(
+#                 title="Query string",
+#                 description="Query string for the items to search in the database that have a good match",
+#                 min_length=3,
+#             ),
+#         ] = None
+# ):
+#     results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
+#     if q:
+#         results.update({"q": q})
+#     return results
+
+
+# Query를 사용하여 쿼리 매개변수에 더 많은 검증과 메타데이터를 선언하는 방법과 동일하게
+# Path를 사용하여 경로 매개변수에 검증과 메타데이터를 같은 타입으로 선언할 수 있다.
+@app.get("/items/{item_id}")
 async def read_items(
-        q: Annotated[
-            str | None,
-            Query(
-                title="Query string",
-                description="Query string for the items to search in the database that have a good match",
-                min_length=3,
-            ),
-        ] = None
+    item_id: Annotated[int, Path(title="The ID of the item to get")],
+    q: Annotated[str | None, Query(alias="item-query")] = None,
 ):
-    results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
+    results = {"item_id": item_id}
     if q:
         results.update({"q": q})
     return results
