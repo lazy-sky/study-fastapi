@@ -1,6 +1,7 @@
 from enum import Enum
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from pydantic import BaseModel
+from typing import Annotated
 
 app = FastAPI()
 
@@ -118,3 +119,20 @@ async def create_item(item_id: int, item: Item, q: str | None = None):
     if q:
         result.update({"q": q})
     return result
+
+# same
+# q: str | None = None
+# q: Annotated[str | None] = None
+# 차이점:
+# - 메타 정보를 줄 수 있음, 아래 경우 쿼리 파라미터에서 값을 받고자 한다는 걸 알게 할 수 있다.
+# - 50자 아래라는 validation도 할 수 있음
+#   - 그래서 데이터가 유효하지 않을 때 더 명확한 에러를 보여줄 수 있음
+# - docs에도 잘 표시됨
+
+
+@app.get("/items/")
+async def read_items(q: Annotated[str | None, Query(max_length=50)] = None):
+    results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
+    if q:
+        results.update({"q": q})
+    return results
